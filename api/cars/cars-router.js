@@ -1,5 +1,5 @@
 const express = require('express')
-const Car = require('./cars-model')
+const Cars = require('./cars-model')
 const {
     checkCarId,
     checkCarPayload,
@@ -11,24 +11,38 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
     try {
-        const cars = await Car.getAll()
-        res.json(cars)
+        const fetch = await Cars.getAll()
+        res.status(200).json(fetch)
     } catch (err) {
-        next(err)
+        res.status(500).json({
+            message: `unknown server-side error. failure to GET`,
+            error: err
+        })
     }
 })
 
 router.get('/:id', checkCarId, async (req, res, next) => {
-    res.json(req.car)
+    try {
+        const car = await Cars.getById(req.params.id)
+        res.status(200).json(car)
+
+    } catch {
+        res.status(500).json({
+            message: `unknown server-side error. failure to GET`,
+        });
+    }
 })
 
 router.post('/', checkCarPayload, checkVinNumberValid, checkVinNumberUnique, async (req, res, next) => {
     try {
-        const car = await Car.create(req.body)
-        res.json(car)
-    } catch (err) {
-        next(err)
+        const newCar = await Cars.create(req.body)
+        res.status(201).json(newCar)
+    } catch {
+        res.status(500).json({
+            message: `unknown server-side error. failure to POST`,
+        });
     }
+
 })
 
 module.exports = router

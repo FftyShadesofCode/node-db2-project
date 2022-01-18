@@ -51,7 +51,7 @@ const checkVinNumberUnique = async (req, res, next) => {
         if (!existing) {
             next()
         } else {
-            next({
+            throw new Error({
                 status: 400,
                 message: `vin ${req.body.vin} already exists`
             })
